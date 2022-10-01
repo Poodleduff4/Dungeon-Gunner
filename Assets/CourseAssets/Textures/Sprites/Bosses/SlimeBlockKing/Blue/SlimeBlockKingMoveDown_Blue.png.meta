@@ -42,6 +42,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -244,6 +245,13 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      SlimeBlockKingMoveDown_Blue_4: 8093063024625266514
+      SlimeBlockKingMoveDown_Blue_1: 1643086110521889758
+      SlimeBlockKingMoveDown_Blue_3: -276315005609394192
+      SlimeBlockKingMoveDown_Blue_2: -3857269146509954957
+      SlimeBlockKingMoveDown_Blue_5: -3042600697115136227
+      SlimeBlockKingMoveDown_Blue_0: -719935858044297979
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

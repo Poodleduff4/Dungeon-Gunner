@@ -42,6 +42,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -244,6 +245,13 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      Bottle_Red_4: -7817694144741258680
+      Bottle_Red_1: 7814743030085756199
+      Bottle_Red_2: -6077513782254241045
+      Bottle_Red_0: 2622213409082645890
+      Bottle_Red_5: 7797503544404294012
+      Bottle_Red_3: -1152721089003551253
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

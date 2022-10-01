@@ -42,6 +42,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -51,8 +52,8 @@ TextureImporter:
   textureSettings:
     serializedVersion: 2
     filterMode: 0
-    aniso: -1
-    mipBias: -100
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -256,6 +257,13 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      GrimonkMoveUpRight_1: -5091971362868798620
+      GrimonkMoveUpRight_3: 8391608746740993449
+      GrimonkMoveUpRight_4: 2422023665014092019
+      GrimonkMoveUpRight_2: 3331130781149873202
+      GrimonkMoveUpRight_0: -9121522558341366106
+      GrimonkMoveUpRight_5: -7508236551640783547
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
