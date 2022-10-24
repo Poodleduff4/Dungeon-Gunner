@@ -5,9 +5,9 @@ using UnityEditor;
 
 public class RoomNodeSO : ScriptableObject
 {
-    [HideInInspector] public string id;
-    [HideInInspector] public List<string> parentRoomNodeIDList = new List<string>();
-    [HideInInspector] public List<string> childRoomNodeIDList = new List<string>();
+    public string id;
+    public List<string> parentRoomNodeIDList = new List<string>();
+    public List<string> childRoomNodeIDList = new List<string>();
     [HideInInspector] public RoomNodeGraphSO roomNodeGraph;
     public RoomNodeTypeSO roomNodeType;
     [HideInInspector] public RoomNodeTypeListSO roomNodeTypeList;
@@ -36,24 +36,30 @@ public class RoomNodeSO : ScriptableObject
         GUILayout.BeginArea(rect, nodeStyle);
         EditorGUI.BeginChangeCheck();
 
-        int selected = roomNodeTypeList.list.FindIndex(x => x == roomNodeType);
-        int selection = EditorGUILayout.Popup("", selected, GetRoomNodeTypesToDisplay());
-        roomNodeType = roomNodeTypeList.list[selection];
-
-        if(EditorGUI.EndChangeCheck())
+        if (parentRoomNodeIDList.Count > 0 || roomNodeType.isEntrance)
+        {
+            EditorGUILayout.LabelField(roomNodeType.roomNodeTypeName);
+        }
+        else
+        {
+            int selected = roomNodeTypeList.list.FindIndex(x => x == roomNodeType);
+            int selection = EditorGUILayout.Popup("", selected, GetRoomNodeTypesToDisplay());
+            roomNodeType = roomNodeTypeList.list[selection];
+        }
+        if (EditorGUI.EndChangeCheck())
         {
             EditorUtility.SetDirty(this);
         }
-        GUILayout.EndArea(); 
+        GUILayout.EndArea();
     }
 
     public string[] GetRoomNodeTypesToDisplay()
     {
         string[] roomArray = new string[roomNodeTypeList.list.Count];
 
-        for(int i = 0;i < roomNodeTypeList.list.Count;i++)
+        for (int i = 0; i < roomNodeTypeList.list.Count; i++)
         {
-            if(roomNodeTypeList.list[i].displayInNodeGraphEditor)
+            if (roomNodeTypeList.list[i].displayInNodeGraphEditor)
             {
                 roomArray[i] = roomNodeTypeList.list[i].roomNodeTypeName;
             }
@@ -87,11 +93,11 @@ public class RoomNodeSO : ScriptableObject
     private void ProcessMouseDownEvent(Event currentEvent)
     {
         Debug.Log("ProcessMouseDownEvent");
-        if(currentEvent.button == 0)
+        if (currentEvent.button == 0)
         {
             ProcessLeftClickDownEvent();
         }
-        else if(currentEvent.button == 1)
+        else if (currentEvent.button == 1)
         {
             ProcessRightClickDownEvent(currentEvent);
         }
@@ -113,7 +119,7 @@ public class RoomNodeSO : ScriptableObject
     private void ProcessMouseUpEvent(Event currentEvent)
     {
         Debug.Log("ProcessMouseUpEvent");
-        if(currentEvent.button == 0)
+        if (currentEvent.button == 0)
         {
             ProcessLeftClickUpEvent();
         }
@@ -121,7 +127,7 @@ public class RoomNodeSO : ScriptableObject
 
     private void ProcessLeftClickUpEvent()
     {
-        if(isLeftClickDragging)
+        if (isLeftClickDragging)
         {
             isLeftClickDragging = false;
         }
@@ -130,7 +136,7 @@ public class RoomNodeSO : ScriptableObject
     private void ProcessMouseDragEvent(Event currentEvent)
     {
         Debug.Log("ProcessMouseDragEvent");
-        if(currentEvent.button == 0)
+        if (currentEvent.button == 0)
         {
             ProcessLeftMouseDragEvent(currentEvent);
         }
@@ -147,6 +153,18 @@ public class RoomNodeSO : ScriptableObject
     {
         rect.position += delta;
         EditorUtility.SetDirty(this);
+    }
+
+    public bool AddChildRoomNodeIDToRoomNode(string childID)
+    {
+        childRoomNodeIDList.Add(childID);
+        return true;
+    }
+
+    public bool AddParentRoomNodeIDToRoomNode(string parentID)
+    {
+        parentRoomNodeIDList.Add(parentID);
+        return true;
     }
 
 #endif
