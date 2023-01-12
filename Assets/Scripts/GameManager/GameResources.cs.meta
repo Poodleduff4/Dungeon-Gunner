@@ -3,7 +3,9 @@ guid: df125096cda30134a93f8b263e9db48a
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - roomNodeTypeList: {instanceID: 0}
+  - dimmedMaterial: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

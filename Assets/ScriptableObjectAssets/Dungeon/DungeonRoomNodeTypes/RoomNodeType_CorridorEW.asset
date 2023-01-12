@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   roomNodeTypeName: Corridor EW
   displayInNodeGraphEditor: 0
-  isCorridor: 0
+  isCorridor: 1
   isCorridorNS: 0
   isCorridorEW: 1
   isEntrance: 0

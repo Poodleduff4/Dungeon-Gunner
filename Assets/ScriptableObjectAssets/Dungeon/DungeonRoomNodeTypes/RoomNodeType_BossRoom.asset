@@ -18,5 +18,5 @@ MonoBehaviour:
   isCorridorNS: 0
   isCorridorEW: 0
   isEntrance: 0
-  isBossRoom: 0
+  isBossRoom: 1
   isNone: 0

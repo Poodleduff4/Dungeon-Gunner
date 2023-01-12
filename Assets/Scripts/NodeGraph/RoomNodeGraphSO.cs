@@ -5,9 +5,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "RoomNodeGraph", menuName = "Scriptable Objects/Dungeon/Room Node Graph")]
 public class RoomNodeGraphSO : ScriptableObject
 {
-    [HideInInspector] public RoomNodeTypeListSO roomNodeTypeList;
-    [HideInInspector] public List<RoomNodeSO> roomNodeList = new List<RoomNodeSO>();
-    [HideInInspector] public Dictionary<string, RoomNodeSO> roomNodeDictionary = new Dictionary<string, RoomNodeSO>();
+    public RoomNodeTypeListSO roomNodeTypeList;
+    public List<RoomNodeSO> roomNodeList = new List<RoomNodeSO>();
+    public Dictionary<string, RoomNodeSO> roomNodeDictionary = new Dictionary<string, RoomNodeSO>();
 
 
     private void Awake()
@@ -23,6 +23,39 @@ public class RoomNodeGraphSO : ScriptableObject
             roomNodeDictionary.Add(node.id, node);
         }
     }
+
+
+    public RoomNodeSO GetRoomNode(RoomNodeTypeSO roomNodeType)
+    {
+        foreach(RoomNodeSO roomNode in roomNodeList)
+        {
+            if(roomNode.roomNodeType == roomNodeType)
+            {
+                return roomNode;
+            }
+        }
+        return null;
+    }
+
+    public IEnumerable<RoomNodeSO> GetChildRoomNodes(RoomNodeSO parentRoomnode)
+    {
+        foreach(string childRoomNodeID in parentRoomnode.childRoomNodeIDList)
+        {
+            yield return GetRoomNode(childRoomNodeID);
+        }
+    }
+
+
+    public RoomNodeSO GetRoomNode(string roomNodeID)
+    {
+        if(roomNodeDictionary.TryGetValue(roomNodeID, out RoomNodeSO roomNode))
+        {
+            return roomNode;
+        }
+        return null;
+    }
+
+
 
     #region Editor Code
 
