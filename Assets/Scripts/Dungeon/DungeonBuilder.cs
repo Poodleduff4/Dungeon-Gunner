@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 [DisallowMultipleComponent]
 
@@ -18,7 +19,7 @@ public class DungeonBuilder : SingletonMonoBehaviour<DungeonBuilder>
 
         LoadRoomNodeTypeList();
 
-        GameResources.Instance.dimmedMaterial.SetFloat("Alpha_Slider, 1f");
+        GameResources.Instance.dimmedMaterial.SetFloat("Alpha_Slider", 1f);
     }
 
     private void LoadRoomNodeTypeList()
@@ -105,6 +106,7 @@ public class DungeonBuilder : SingletonMonoBehaviour<DungeonBuilder>
         {
             return true;
         }
+        return false;
     }
 
     private bool ProcessRoomsInQueue(RoomNodeGraphSO roomNodeGraph, Queue<RoomNodeSO> openRoomNodeQueue, bool noRoomOverlaps)
@@ -156,13 +158,22 @@ public class DungeonBuilder : SingletonMonoBehaviour<DungeonBuilder>
 
             RoomTemplateSO roomTemplate = GetRandomTemplateForRoomConsistentWithParent(roomNode, doorwayParent);
 
-            Room room = CreateRoomFromRoomTemplate(roomTemplate);
+            Room room = CreateRoomFromRoomTemplate(roomTemplate, roomNode);
 
-            if(PlaceTheRoom(parent, doorwayParent, room))
+            if (PlaceTheRoom(parentRoom, doorwayParent, room))
             {
+                roomOverlaps = false;
 
+                room.isPositioned = true;
+                dungeonBuilderRoomDictionary.Add(room.id, room);
+            }
+            else
+            {
+                roomOverlaps = true;
             }
         }
+
+        return true;
     }
 
     private RoomTemplateSO GetRandomTemplateForRoomConsistentWithParent(RoomNodeSO roomNode, Doorway doorwayParent)
@@ -202,28 +213,124 @@ public class DungeonBuilder : SingletonMonoBehaviour<DungeonBuilder>
     {
         Doorway doorway = GetOppositeDoorway(parentDoorway, room.doorwayList);
 
-        if(doorway == null)
+        if (doorway == null)
         {
             parentDoorway.isUnavailable = true;
 
             return false;
         }
 
-        vector
+        Vector2Int parentDoorwayPosition = parentRoom.lowerBounds + (parentDoorway.position - parentRoom.templateLowerBounds);
+
+        Vector2Int adjustment = Vector2Int.zero;
+
+        switch (doorway.orientation)
+        {
+            case Orientation.north:
+                adjustment = new Vector2Int(0, -1);
+                break;
+
+            case Orientation.east:
+                adjustment = new Vector2Int(-1, 0);
+                break;
+
+            case Orientation.south:
+                adjustment = new Vector2Int(0, 1);
+                break;
+
+            case Orientation.west:
+                adjustment = new Vector2Int(1, 0);
+                break;
+
+            case Orientation.none:
+                break;
+
+            default:
+                break;
+        }
+
+        room.lowerBounds = parentDoorwayPosition + adjustment + room.templateLowerBounds - doorway.position;
+        room.upperBounds = room.lowerBounds + (room.templateUpperBounds - room.templateLowerBounds);
+
+        Room overlappingRoom = CheckForRoomOverlap(room);
+
+        if(overlappingRoom == null)
+        {
+            parentDoorway.isConnected = true;
+            parentDoorway.isUnavailable = true;
+
+            doorway.isConnected = true;
+            doorway.isUnavailable = true;
+
+            return true;
+        }
+        else
+        {
+            parentDoorway.isUnavailable = true;
+
+            return false;
+        }
     }
 
     private Doorway GetOppositeDoorway(Doorway parentDoorway, List<Doorway> doorways)
     {
-        foreach(Doorway doorwayToCheck in doorways)
+        foreach (Doorway doorwayToCheck in doorways)
         {
-            
 
-            if(Mathf.Abs((int)parentDoorway.orientation - (int)doorwayToCheck.orientation) == 2)
+
+            if (Mathf.Abs((int)parentDoorway.orientation - (int)doorwayToCheck.orientation) == 2)
             {
                 return doorwayToCheck;
             }
         }
         return null;
+    }
+
+    private Room CheckForRoomOverlap(Room roomToTest)
+    {
+        foreach(KeyValuePair<string, Room> keyValuePair in dungeonBuilderRoomDictionary)
+        {
+            Room room = keyValuePair.Value;
+
+            if(room.id == roomToTest.id || !room.isPositioned)
+            {
+                continue;
+            }
+
+            if(IsOverlappingRoom(roomToTest, room))
+            {
+                return room;
+            }
+
+        }
+
+        return null;
+    }
+
+    private bool IsOverlappingRoom(Room roomToTest, Room room)
+    {
+        if(IsOverlappingInterval(room.lowerBounds.x, room.upperBounds.x, roomToTest.lowerBounds.x, roomToTest.upperBounds.x) && 
+        IsOverlappingInterval(room.lowerBounds.y, room.upperBounds.y, roomToTest.lowerBounds.y, roomToTest.upperBounds.y))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        
+    }
+
+    private bool IsOverlappingInterval(int imin1, int imax1, int imin2, int imax2)
+    {
+        if(Mathf.Max(imin1, imin2) <= Mathf.Min(imax1, imax2))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     private IEnumerable<Doorway> GetUnconnectedAvailableDoorways(List<Doorway> doorways)
@@ -234,6 +341,26 @@ public class DungeonBuilder : SingletonMonoBehaviour<DungeonBuilder>
             {
                 yield return doorway;
             }
+        }
+    }
+
+    private void InstantiateRoomGameObjects()
+    {
+        foreach(KeyValuePair<string, Room> keyvaluepair in dungeonBuilderRoomDictionary)
+        {
+            Room room = keyvaluepair.Value;
+
+            Vector3 roomPosition = new Vector3(room.lowerBounds.x - room.templateLowerBounds.x, room.lowerBounds.y - room.templateLowerBounds.y, 0f);
+
+            GameObject roomGameObject = Instantiate(room.prefab, roomPosition, Quaternion.identity, transform);
+
+            InstantiateRoom instantiatedRoom = roomGameObject.GetComponentInChildren<InstantiateRoom>();
+
+            instantiatedRoom.room = room;
+
+            instantiatedRoom.Initialize(roomGameObject);
+
+            room.instantiateRoom = instantiatedRoom;
         }
     }
 
@@ -339,6 +466,30 @@ public class DungeonBuilder : SingletonMonoBehaviour<DungeonBuilder>
                 }
             }
             dungeonBuilderRoomDictionary.Clear();
+        }
+    }
+
+    public RoomTemplateSO GetRoomTemplate(string id)
+    {
+        if(roomTemplateDictionary.TryGetValue(id, out RoomTemplateSO roomTemplate))
+        {
+            return roomTemplate;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public Room GetRoomByRoomID(string id)
+    {
+        if(dungeonBuilderRoomDictionary.TryGetValue(id, out Room room))
+        {
+            return room;
+        }
+        else
+        {
+            return null;
         }
     }
 }
